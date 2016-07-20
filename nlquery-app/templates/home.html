@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block header %}
+<link rel="stylesheet" href="{{ static_url("css/home.css") }}" type="text/css">
+{% end %}
+
+{% block body %}
+
+<div class="jumbotron" style="margin-bottom: 0">
+    <div class="container">
+        <h1>NLQuery</h1>
+        <form class="form-group" id="query-form" autocomplete="off">
+            <div class="input-group">
+            <input id="query" type="text" class="input-lg form-control"/>
+            <span class="input-group-btn">
+                <input type="submit" id="search" class="btn btn-default btn-lg" type="button" value='Go!'/>
+                <div id="loader" style="display: none">
+                <img width="32px" height="32px" src="{{ static_url("img/ajax_loader.gif") }}">
+                </div>
+            </span>
+            </div>
+        </form>
+        <div class="panel panel-primary with-nav-tabs panel-default">
+            <div class="panel-heading">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a href="#tab1" data-toggle="tab">Result</a></li>
+                    <li><a href="#tab2" data-toggle="tab">Tree</a></li>
+                    <li><a href="#tab3" data-toggle="tab">Sparql</a></li>
+                </ul>
+            </div>
+            <div class="panel-body">
+                <div class="tab-content">
+                    <div class="tab-pane fade in active" id="tab1">
+                        <label>Question</label>
+                        <div id="query-resp">
+                        </div>
+                        <hr>
+                        <label>Params</label>
+                        <div id="params-resp">
+                        </div>
+                        <hr>
+                        <label>Answer</label>
+                        <div id="ans-resp">
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="tab2">
+                        <div id="tree-resp">
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="tab3">
+                        <div id="sparql-resp">
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="tab4"></div>
+                    <div class="tab-pane fade" id="tab5"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% end %}
+
+{% block footer %}
+<script src="/static/js/home.js"></script>
+{% end %}

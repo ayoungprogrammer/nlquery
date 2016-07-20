@@ -1,0 +1,15 @@
+.DS_Store
+*.gz
+*.part
+*.xml
+*.pyc
+*.egg-info
+*.orig
+.cache/
+.idea/
+stanford*/
+data/
+cache/
+dist/
+build/
+nlquery-app/env*
