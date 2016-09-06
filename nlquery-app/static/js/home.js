@@ -6,9 +6,10 @@ $(document).ready(function(){
             return;
         }
         var query = $('#query').val();
-        loading = true;
+        // loading = true;
         $('#search').hide();
         $('#loader').show();
+        $('#ans-resp').text('Loading...');
         $.post(
             '/query',
             JSON.stringify({'q': query}),
@@ -24,10 +25,12 @@ $(document).ready(function(){
                 $('#loader').hide();
             },
             'json'
-        ).error(function(){
+        ).error(function(resp){
             loading = false;
             $('#search').show();
             $('#loader').hide();
+            console.log(resp);
+            $('#ans-resp').text(resp.responseText);
         });
     });
 });

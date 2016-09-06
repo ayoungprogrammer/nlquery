@@ -4,12 +4,12 @@ from lango.parser import StanfordServerParser
 from pattern.en import singularize
 from wikidata import WikiData
 from utils import first
-from api_adapter import ApiAdapter
+from api_adapter import LoggingInterface
 from answer import Answer
 
 from threading import local
 
-class NLQueryEngine(ApiAdapter):
+class NLQueryEngine(LoggingInterface):
     """
     Grammar mapping for knowledge queries of the form:
     - What is the X of Y
@@ -17,7 +17,7 @@ class NLQueryEngine(ApiAdapter):
     """
 
     def __init__(self, host='localhost', port=9000, properties={}):
-        ApiAdapter.__init__(self)
+        LoggingInterface.__init__(self)
         self.parser = StanfordServerParser(host, port, properties)
 
         """
@@ -158,6 +158,20 @@ class NLQueryEngine(ApiAdapter):
         self.wd = WikiData()
 
     def subject_query(self, qtype, subject, action, jj=None, prop=None, prop2=None, prop3=None):
+        """Transforms matched context into query parameters and performs query
+
+        Args:
+            qtype: Matched type of query (what, who, where, etc.)
+            subject: Matched subject (Obama)
+            action: Matched verb action (is, was, ran)
+            jj (optional): Matched adverb
+            prop (optional): Matched prop
+            prop2 (optional): Matched prop
+            prop3 (optional): Matched prop
+
+        Returns:
+            Answer: Answer from query, or empty Answer if None
+        """
         if jj == 'old':
             # How old is Obama?
             prop = 'age'
@@ -188,15 +202,18 @@ class NLQueryEngine(ApiAdapter):
         return ans
 
     def get_prop_tuple(self, prop=None, value=None, op=None, value_units=None, pp_t=None):
-        """
-        Returns a property tuple (prop, value, op). E.g. (population, 1000000, >)
-        :param prop: Property to search for (e.g. population)
-        :param value: Value property should equal (e.g. 10000000)
-        :param op: Operator for value of property (e.g. >)
-        :return: Property tuple
+        """Returns a property tuple (prop, value, op). E.g. (population, 1000000, >)
+        
+        Args:
+            prop (str): Property to search for (e.g. population)
+            value (str): Value property should equal (e.g. 10000000)
+            op (str): Operator for value of property (e.g. >)
+
+        Returns:
+            tuple: Property tuple, e.g: (population, 10000000, >)
         """
 
-        print 'Prop tuple: {0},{1},{2},{3},{4}'.format(prop, value, op, value_units, pp_t)
+        self.info('Prop tuple: {0},{1},{2},{3},{4}', prop, value, op, value_units, pp_t)
 
         if op in ['in', 'by', 'of']:
             oper = op
@@ -205,7 +222,7 @@ class NLQueryEngine(ApiAdapter):
         elif op in ['under', 'below', 'less']:
             oper = '<'
         else:
-            print 'NO OP ', op
+            self.error('NO OP {0}', op)
             return None
 
         # Infer property to match value
@@ -227,7 +244,19 @@ class NLQueryEngine(ApiAdapter):
         return props
 
     def find_entity_query(self, qtype, inst, prop_match_t=None, prop_match2_t=None):
-        print 'find enttiy: {0},{1},{2},{3}'.format(qtype, inst, prop_match_t, prop_match2_t)
+        """Transforms matched context into query parameters and performs query for
+        queries to find entities
+
+        Args:
+            qtype (str): Matched type of query (what, who, where, etc.)
+            inst (str): Matched instance of entity to match (Obama)
+            action (str): Matched verb action (is, was, ran)
+            prop_match_t (Tree): Matched property Tree
+            prop_match2_t (Tree): Matched property Tree
+
+        Returns:
+            Answer: Answer from query, or empty Answer if None
+        """
         props = []
         if prop_match_t:
             prop = match_rules(prop_match_t, self.prop_rules, self.get_prop_tuple)
@@ -259,16 +288,46 @@ class NLQueryEngine(ApiAdapter):
         }
         return ans
 
-    # get property of subject
     def get_property(self, qtype, subject, prop):
+        """Gets property of a subject
+        Example: 
+            get_property('who', 'Obama', 'wife') = 'Michelle Obama'
+
+        Args:
+            subject: Subject to get property of
+            prop: Property to get of subject
+
+        Todo:
+            * Add other APIs here
+
+        Returns:
+            Answer: Answer from query
+        """
         return self.wd.get_property(qtype, subject, prop)
 
     def preprocess(self, sent):
+        """Preprocesses a query by adding punctuation"""
         if sent[-1] != '?':
             sent = sent + '?'
         return sent
 
     def query(self, sent, format_='plain'):
+        """Answers a query
+
+        If format is plain, will return the answer as a string
+        If format is raw, will return the raw context of query
+
+        Args:
+            sent: Query sentence
+            format_: Format of answer to return (Default to plain)
+
+        Returns:
+            dict: Answer context
+            str: Answer as a string
+
+        Raises:
+            ValueError: If format_ is incorrect
+        """
         sent = self.preprocess(sent)
         tree = self.parser.parse(sent)
         context = {'query': sent, 'tree': tree}
@@ -290,5 +349,3 @@ class NLQueryEngine(ApiAdapter):
             return ans.to_plain()
         else:
             raise ValueError('Undefined format: %s' % format_)
-
-

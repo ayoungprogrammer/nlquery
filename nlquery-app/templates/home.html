@@ -9,6 +9,9 @@
 <div class="jumbotron" style="margin-bottom: 0">
     <div class="container">
         <h1>NLQuery</h1>
+        <p>
+            Query the world using natural language
+        </p>
         <form class="form-group" id="query-form" autocomplete="off">
             <div class="input-group">
             <input id="query" type="text" class="input-lg form-control"/>
@@ -20,45 +23,69 @@
             </span>
             </div>
         </form>
-        <div class="panel panel-primary with-nav-tabs panel-default">
-            <div class="panel-heading">
-                <ul class="nav nav-tabs">
-                    <li class="active"><a href="#tab1" data-toggle="tab">Result</a></li>
-                    <li><a href="#tab2" data-toggle="tab">Tree</a></li>
-                    <li><a href="#tab3" data-toggle="tab">Sparql</a></li>
-                </ul>
-            </div>
-            <div class="panel-body">
-                <div class="tab-content">
-                    <div class="tab-pane fade in active" id="tab1">
-                        <label>Question</label>
-                        <div id="query-resp">
-                        </div>
-                        <hr>
-                        <label>Params</label>
-                        <div id="params-resp">
-                        </div>
-                        <hr>
-                        <label>Answer</label>
-                        <div id="ans-resp">
-                        </div>
+    </div>
+</div>
+<div class="container">
+    <div class="panel panel-primary with-nav-tabs panel-default">
+        <div class="panel-heading">
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="#tab1" data-toggle="tab">Result</a></li>
+                <li><a href="#tab2" data-toggle="tab">Tree</a></li>
+                <li><a href="#tab3" data-toggle="tab">Sparql</a></li>
+            </ul>
+        </div>
+        <div class="panel-body">
+            <div class="tab-content">
+                <div class="tab-pane fade in active" id="tab1">
+                    <label>Question</label>
+                    <div id="query-resp">
                     </div>
-                    <div class="tab-pane fade" id="tab2">
-                        <div id="tree-resp">
-                        </div>
+                    <hr>
+                    <label>Params</label>
+                    <div id="params-resp">
                     </div>
-                    <div class="tab-pane fade" id="tab3">
-                        <div id="sparql-resp">
-                        </div>
+                    <hr>
+                    <label>Answer</label>
+                    <div id="ans-resp">
                     </div>
-                    <div class="tab-pane fade" id="tab4"></div>
-                    <div class="tab-pane fade" id="tab5"></div>
                 </div>
+                <div class="tab-pane fade" id="tab2">
+                    <div id="tree-resp">
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="tab3">
+                    <div id="sparql-resp">
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="tab4"></div>
+                <div class="tab-pane fade" id="tab5"></div>
             </div>
         </div>
     </div>
-</div>
+    <div class="panel panel-default">
+      <div class="panel-heading">Examples</div>
+      <div class="panel-body">
+        Who is Obama? 44th President of the United States<br>
+        How tall is Yao Ming? 2.286m<br>
+        Where was Obama born? Kapiolani Medical Center for Women and Children<br>
+        When was Obama born? August 04, 1961<br>
+        Who did Obama marry? Michelle Obama<br>
+        Who is Obama's wife? Michelle Obama<br>
+        Who is Barack Obama's wife? Michelle Obama<br>
+        Who was Malcolm Little known as? Malcolm X<br>
+        What is the birthday of Obama? August 04, 1961<br>
+        What religion is Obama? Christianity<br>
+        Who did Obama marry? Michelle Obama<br>
 
+        How many countries are there? 196<br>
+        Which countries have a population over 1000000000? People's Republic of China, India<br>
+        Which books are written by Douglas Adams? The Hitchhiker's Guide to the Galaxy, ...<br>
+        Who was POTUS in 1945? Harry S. Truman<br>
+        Who was Prime Minister of Canada in 1945? William Lyon Mackenzie King<br>
+        Who was CEO of Apple Inc in 1980? Steve Jobs<br>
+      </div>
+    </div>
+</div>
 
 {% end %}
 

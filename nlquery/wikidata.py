@@ -6,7 +6,9 @@ import arrow
 from dateutil.relativedelta import relativedelta
 from answer import Answer
 
+
 class WikiDataAnswer(Answer):
+    """Answer object from WikiData source"""
 
     TIME_VALUE = 'http://wikiba.se/ontology#TimeValue'
     QUANTITY_VALUE = 'http://wikiba.se/ontology#QuantityValue'
@@ -28,10 +30,12 @@ class WikiDataAnswer(Answer):
 
     @staticmethod
     def get_data(bindings):
+        """Gets values from the list of results"""
         return [WikiDataAnswer.get_value(b) for b in bindings]
 
     @staticmethod
     def get_value(data):
+        """Gets Python type value from WikiData response field"""
         data_type = dget(data, 'type.value')
         value = dget(data, 'valLabel.value')
 
@@ -46,11 +50,13 @@ class WikiDataAnswer(Answer):
         else:
             return value
 
+
 class WikiData(RestAdapter):
+    """REST Adapter for WikiData API endpoint"""
     WIKIDATA_URL = 'https://www.wikidata.org/w/api.php'
     WDSPARQL_URL = 'https://query.wikidata.org/sparql'
 
-    def query_wdsparql(self, query):
+    def _query_wdsparql(self, query):
         params = {
             'format': 'json',
             'query': query
@@ -58,11 +64,11 @@ class WikiData(RestAdapter):
         self.debug(query)
         return self.get(self.WDSPARQL_URL, params=params)
 
-    def query_wikidata(self, params):
+    def _query_wikidata(self, params):
         return self.get(self.WIKIDATA_URL, params=params)
 
-    def search_entity(self, name, _type='item'):
-
+    def _search_entity(self, name, _type='item'):
+        """Search for an entity from string"""
         if _type not in ['item', 'property']:
             return None
 
@@ -74,50 +80,30 @@ class WikiData(RestAdapter):
             'type': _type,
         }
 
-        data = self.query_wikidata(params)
+        data = self._query_wikidata(params)
         return data
 
-    def get_desc(self, subject):
-        data = self.search_entity(subject)
+
+    def _get_desc(self, subject):
+        """Get WikiData description of subject"""
+        data = self._search_entity(subject)
         desc = dget(data, 'search.0.description')
         return Answer(data=desc)
 
-    def get_id(self, name, _type='item'):
-        item = self.search_entity(name, _type)
+
+    def _get_id(self, name, _type='item'):
+        """Get WikiData ID of a name"""
+        item = self._search_entity(name, _type)
         return dget(item, 'search.0.id')
 
-    def get_property(self, qtype, subject, prop):
-        prop_id = None
-        if prop is None:
-            return self.get_desc(subject)
-        if prop == 'age':
-            bday_ans = self._get_property(subject, 'birthday')
-            if not bday_ans:
-                return None
-            birthday = bday_ans.data[0]
-            years = relativedelta(datetime.now(), birthday).years
-            bday_ans.data = years
-            return bday_ans
-
-        if prop == 'born':
-            if qtype == 'where':
-                prop_id = 'P19'
-            elif qtype == 'when':
-                prop_id = 'P569'
-        if prop == 'height':
-            prop_id = 'P2044,P2048'
-
-        if prop in ['nickname', 'known as', 'alias', 'called']:
-            return self._get_aliases(subject)
-
-        return self._get_property(subject, prop, prop_id=prop_id)
 
     def _get_property(self, subject, prop, prop_id=None):
+        """Queries Wikidata to get property"""
         self.debug('{0}, {1}', subject, prop)
-        subject_id = self.get_id(subject, 'item')
+        subject_id = self._get_id(subject, 'item')
 
         if not prop_id:
-            prop_id = self.get_id(prop, 'property')
+            prop_id = self._get_id(prop, 'property')
 
         if not prop_id or not subject_id:
             return None
@@ -143,14 +129,15 @@ class WikiData(RestAdapter):
         }
         """
 
-        result =  self.query_wdsparql(query)
+        result =  self._query_wdsparql(query)
         bindings = dget(result, 'results.bindings')
         return WikiDataAnswer(sparql_query=query, bindings=bindings)
 
 
     def _get_aliases(self, subject):
+        """Get all aliases of an entity"""
         self.debug('Get alias {0}'.format(subject))
-        subject_id = self.get_id(subject, 'item')
+        subject_id = self._get_id(subject, 'item')
         query = """
         SELECT ?valLabel
         WHERE {
@@ -160,39 +147,15 @@ class WikiData(RestAdapter):
             SERVICE wikibase:label { bd:serviceParam wikibase:language "en"} 
         }""" % (subject_id, subject_id)
 
-        result =  self.query_wdsparql(query)
+        result =  self._query_wdsparql(query)
         bindings = dget(result, 'results.bindings')
         return WikiDataAnswer(sparql_query=query, bindings=bindings)
 
-    def find_entity(self, qtype, inst, props):
-        if inst.lower() in ['the president', 'president', 'the prime minister', 'prime minister']:
-            for index, tup in enumerate(props):
-                prop, prop_val, op = tup
-                if op == 'of':
-                    inst = '{0} {1} {2}'.format(inst, op, prop_val)
-                    props.pop(index)
-
-        ans = self._find_entity(qtype, inst, props)
-
-        return ans
-
     def _find_entity(self, qtype, inst, params):
-        """
-        Count number of things instance/subclass of inst with prop = prop_val
-        :param qtype: Type of question (which, how many)
-        :param inst: Instances of object we are querying
-        :param params: Array of property-value-operator tuples to query [(property, value, op)]
-                       property - property to match value
-                       value - value that property should be
-                       op - One of  '=', '<' or '>'
-                       If property is None, then property will be inferred by instance of value
-        :return: None if result not found
-                 Number of results for query if qtype is how many
-                 First 5 results if qtype is which
-        """
+        """Count number of things instance/subclass of inst with props"""
         self.info('Get instances of {0} that are {1}'.format(inst, params))
 
-        inst_id = self.get_id(inst)
+        inst_id = self._get_id(inst)
 
         if not inst_id:
             self.info('Cannot find id of: {0}'.format(inst))
@@ -220,7 +183,7 @@ class WikiData(RestAdapter):
 
         for prop, prop_val, op in params:
             if op in ['>', '<']:
-                prop_id = self.get_id(prop, 'property')
+                prop_id = self._get_id(prop, 'property')
                 self.info('Count number of {0} where {1} {2} {3}'.format(
                     inst, prop_id, op, prop_val))
                 query += """
@@ -236,16 +199,16 @@ class WikiData(RestAdapter):
                     FILTER (?startDate < "%s"^^xsd:dateTime && ?endDate > "%s"^^xsd:dateTime)
                     """ % (iso_time, iso_time)
                 elif op == 'of' and prop_val:
-                    prop_val_id = self.get_id(prop_val)
+                    prop_val_id = self._get_id(prop_val)
 
                     query += """
                     ?pos pq:P108 wd:%s . # pos.employer
                     """ % (prop_val_id)
                 else:
                     # Get value entity
-                    prop_val_id = self.get_id(prop_val)
+                    prop_val_id = self._get_id(prop_val)
                     if prop:
-                        prop_id = self.get_id(prop, 'property')
+                        prop_id = self._get_id(prop, 'property')
                         query += '?val wdt:%s wd:%s .\n' % (prop_id, prop_val_id)
                     else:
                         # Infer property of value
@@ -266,7 +229,7 @@ class WikiData(RestAdapter):
         }
 
         try:
-            data = self.query_wdsparql(query)
+            data = self._query_wdsparql(query)
         except ValueError:
             self.error('Error parsing data')
             return WikiDataAnswer(**result)
@@ -277,3 +240,66 @@ class WikiData(RestAdapter):
             result['bindings'] = dget(data, 'results.bindings')
             
         return WikiDataAnswer(**result)
+
+
+    def get_property(self, qtype, subject, prop):
+        """Gets property of subject from Wikidata
+
+        Args:
+            qtype: Type of question (which, how many)
+            subject: Name of entity to get property of
+            prop: Property to get of subject
+
+        """
+
+        prop_id = None
+        if prop is None:
+            return self._get_desc(subject)
+        if prop == 'age':
+            bday_ans = self._get_property(subject, 'birthday')
+            if not bday_ans:
+                return None
+            birthday = bday_ans.data[0]
+            years = relativedelta(datetime.now(), birthday).years
+            bday_ans.data = years
+            return bday_ans
+
+        if prop == 'born':
+            if qtype == 'where':
+                prop_id = 'P19'
+            elif qtype == 'when':
+                prop_id = 'P569'
+        if prop == 'height':
+            prop_id = 'P2044,P2048'
+
+        if prop in ['nickname', 'known as', 'alias', 'called']:
+            return self._get_aliases(subject)
+
+        return self._get_property(subject, prop, prop_id=prop_id)
+
+
+    def find_entity(self, qtype, inst, props):
+        """Count number of things instance/subclass of inst with prop = prop_val
+
+        Args:
+            qtype: Type of question (which, how many)
+            inst: Instances of object we are querying
+            params: Array of property-value-operator tuples to query [(property, value, op)]
+                property - property to match value
+                value - value that property should be
+                op - One of  '=', '<' or '>'
+                If property is None, then property will be inferred by instance of value
+
+        Returns:
+            WikiDataAnswer: Answer from result
+        """
+        if inst.lower() in ['the president', 'president', 'the prime minister', 'prime minister']:
+            for index, tup in enumerate(props):
+                prop, prop_val, op = tup
+                if op == 'of':
+                    inst = '{0} {1} {2}'.format(inst, op, prop_val)
+                    props.pop(index)
+
+        ans = self._find_entity(qtype, inst, props)
+
+        return ans

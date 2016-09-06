@@ -1,8 +1,8 @@
 import logging
 import requests
 
-class ApiAdapter:
-
+class LoggingInterface:
+    """Interface for logging methods"""
     def __init__(self):
         self.logger = logging.getLogger(self.__class__.__module__)
         self.logger.setLevel(logging.DEBUG)
@@ -11,6 +11,8 @@ class ApiAdapter:
         self.logger.addHandler(ch)
 
     def format_log(self, format_str, *args, **kwargs):
+        """Formats a string for logging"""
+
         if len(args) + len(kwargs) == 0:
             return format_str
         if kwargs.get('_format') is False:
@@ -34,9 +36,25 @@ class ApiAdapter:
         self.logger.error(msg)
 
 
-class RestAdapter(ApiAdapter):
+class RestAdapter(LoggingInterface):
+    """Adapter for an Rest API endpoint
+
+    Comes with logging methods
+    """
 
     def get(self, url, params={}, headers=None, format_='json'):
+        """Calls the get method for a REST endpoint. 
+
+        Args:
+            url (str): URL of endpoint
+            params (url): params for endpoint
+            headers (dict, optional): any additional header attrs. Default to None
+            format_ (str, optional): Format requested. Default to json
+
+        Returns:
+            dict: Response of request if format is json
+            str: Response of request if format is not json
+        """
         try:
             response = requests.get(url, params=params, headers=headers)
         except requests.exceptions.ConnectionError:
@@ -53,7 +71,3 @@ class RestAdapter(ApiAdapter):
             return json_data
         else:
             return response.text
-
-
-class LibraryAdapter(ApiAdapter):
-    pass

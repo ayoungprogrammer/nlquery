@@ -1,5 +1,12 @@
+from datetime import datetime
 import arrow
-import os
+
+
+def conv_to_str(value):
+    if isinstance(value, datetime):
+        return value.strftime('%B %d, %Y')
+    else:
+        return unicode(value)
 
 
 def isfloat(value):
@@ -16,15 +23,20 @@ def first(lst):
     return next((x for x in lst if x), None)
 
 
-def first_return(functions, **args):
-    for f in functions:
-        ans = f(**args)
-        if ans:
-            return ans
-    return None
-
-
 def dget(d, dkey, default=None):
+    """Dictionary get: gets the field from nested key
+
+    Args:
+        d (dict, list): Dictionary/list to retrieve field from
+        dkey (str): Nested key to retrive field from dictionary/list separated 
+            by periods. Example: key1.3.key2, this will be the equivalent of 
+            d['key1'][3]['key2'].
+        default (optional): Default object to return if value not found. 
+            Defaults to None.
+
+    Returns:
+        Any: field to return from dict or default if not found.
+    """
     keys = dkey.split('.')
     obj = d
 
@@ -43,27 +55,3 @@ def dget(d, dkey, default=None):
             else:
                 return default
     return obj
-
-
-def starts_with_any(sent, arr):
-    for word in arr:
-        if sent[:len(word)].lower() == word:
-            return True
-    return False
-
-
-def get_env():
-    return os.environ.get('ENV', 'dev')
-
-
-def calc_age(time):
-    if not time:
-        return None
-
-    try:
-        born = arrow.get(time)
-    except arrow.parser.ParserError:
-        print 'Error parsing time: {0}'.format(time)
-        return None
-    today = arrow.now()
-    return str(today.year - born.year - ((today.month, today.day) < (born.month, born.day)))
