@@ -2,6 +2,8 @@
 
 A natural language query engine on WikiData. 
 
+[Demo](http://nlquery.ayoungprogrammer.com)
+
 Sample queries:
 ```
 Who is Obama? 44th President of the United States
@@ -47,7 +49,22 @@ Who did Obama marry?
 -> Michelle Obama
 ```
 
-# Install Command line
+## Install
+
+### Download Stanford CoreNLP
+
+Make sure you have Java installed for the Stanford CoreNLP to work.
+
+[Download Stanford CoreNLP](http://stanfordnlp.github.io/CoreNLP/#download)
+
+### Run the Stanford CoreNLP server
+
+Run the following command in the folder where you extracted Stanford CoreNLP
+```
+java -mx4g -cp "*" edu.stanford.nlp.pipeline.StanfordCoreNLPServer
+```
+
+### Install nlquery
 
 ```
 git clone https://github.com/ayoungprogrammer/nlquery
@@ -55,13 +72,18 @@ cd nlquery
 pip install -r requirements.txt
 ```
 
+## Run
+
 Start the command line:
 
 ```
 python main.py
 ```
 
-# Tests
+To run web app, go to nlquery-app/readme.md
+
+
+## Tests
 
 Run
 ```

@@ -250,11 +250,15 @@ class WikiData(RestAdapter):
             subject: Name of entity to get property of
             prop: Property to get of subject
 
+        Returns:
+            WikiDataAnswer: Answer from result
         """
 
         prop_id = None
+
         if prop is None:
             return self._get_desc(subject)
+
         if prop == 'age':
             bday_ans = self._get_property(subject, 'birthday')
             if not bday_ans:
@@ -269,6 +273,7 @@ class WikiData(RestAdapter):
                 prop_id = 'P19'
             elif qtype == 'when':
                 prop_id = 'P569'
+
         if prop == 'height':
             prop_id = 'P2044,P2048'
 
@@ -284,7 +289,8 @@ class WikiData(RestAdapter):
         Args:
             qtype: Type of question (which, how many)
             inst: Instances of object we are querying
-            params: Array of property-value-operator tuples to query [(property, value, op)]
+            params: Array of property-value-operator tuples to query
+                [(property, value, op)]
                 property - property to match value
                 value - value that property should be
                 op - One of  '=', '<' or '>'

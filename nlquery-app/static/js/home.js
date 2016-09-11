@@ -8,7 +8,7 @@ $(document).ready(function(){
         var query = $('#query').val();
         // loading = true;
         $('#search').hide();
-        $('#loader').show();
+        $('#loader-div').show();
         $('#ans-resp').text('Loading...');
         $.post(
             '/query',
@@ -28,7 +28,7 @@ $(document).ready(function(){
         ).error(function(resp){
             loading = false;
             $('#search').show();
-            $('#loader').hide();
+            $('#loader-div').hide();
             console.log(resp);
             $('#ans-resp').text(resp.responseText);
         });

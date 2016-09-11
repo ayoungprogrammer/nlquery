@@ -93,6 +93,7 @@ def make_app():
 if __name__ == "__main__":
     parse_command_line()
     app = make_app()
+    print "Running at localhost:8888"
     server = gevent.wsgi.WSGIServer(('', 8888), app)
     server.serve_forever()
 
