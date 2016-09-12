@@ -22,7 +22,7 @@ $(document).ready(function(){
 
                 loading = false;
                 $('#search').show();
-                $('#loader').hide();
+                $('#loader-div').hide();
             },
             'json'
         ).error(function(resp){
