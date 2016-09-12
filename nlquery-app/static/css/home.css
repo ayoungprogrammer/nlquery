@@ -5,8 +5,7 @@
     background: white;
     border: #ccc solid 1px;
     margin-left: -1px;
-    -webkit-appearance: button;
-    cursor: pointer
+    cursor: pointer;
 }
 
 .panel {
