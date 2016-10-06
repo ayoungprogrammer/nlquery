@@ -1,3 +1,4 @@
 lango==0.12
 pattern==2.6
 arrow==0.7.0
+grequests==0.3.0

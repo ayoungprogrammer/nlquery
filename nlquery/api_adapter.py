@@ -1,5 +1,5 @@
 import logging
-import requests
+import grequests
 
 class LoggingInterface:
     """Interface for logging methods"""
@@ -56,7 +56,8 @@ class RestAdapter(LoggingInterface):
             str: Response of request if format is not json
         """
         try:
-            response = requests.get(url, params=params, headers=headers)
+            greq = grequests.get(url, params=params, headers=headers)
+            response = grequests.map([greq])[0]
         except requests.exceptions.ConnectionError:
             print 'ConnectionError'
             return None
