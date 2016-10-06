@@ -1,0 +1,8 @@
+304 GET / (127.0.0.1) 11.32ms
+304 GET /static/css/home.css?v=b2a20733e3648638a27c045f5a80d4ab (127.0.0.1) 25.87ms
+304 GET /static/js/home.js?v=82c42bf3805a021b4a3819e8617dc24b (127.0.0.1) 1.07ms
+304 GET /static/img/ajax_loader.gif?v=b5ea9f0222ca2b906842ea5f2954af25 (127.0.0.1) 0.99ms
+Query: Who is Obama
+(SBARQ (WHNP (WP Who)) (SQ (VBZ is) (NP (NNP Obama))) (. ?))
+https://www.wikidata.org/w/api.php?action=wbsearchentities&search=obama&type=item&language=en&format=json
+200 POST /query (127.0.0.1) 705.77ms

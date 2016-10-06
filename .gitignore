@@ -13,3 +13,4 @@ cache/
 dist/
 build/
 nlquery-app/env*
+logs/*

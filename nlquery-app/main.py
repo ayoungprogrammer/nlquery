@@ -8,9 +8,15 @@ from tornado.options import define, options, parse_command_line
 from nlquery.nlquery import NLQueryEngine
 import os
 import json
+import logging
 
 define("port", default=8888, help="run on the given port", type=int)
 define("debug", default=False, help="run in debug mode")
+
+logging.getLogger("requests").setLevel(logging.WARNING)
+logger = logging.getLogger()
+fh = logging.FileHandler('logs/queries.log')
+logger.addHandler(fh)
 
 nlquery = NLQueryEngine('localhost', 9000)
 
@@ -60,6 +66,7 @@ class MainHandler(tornado.web.RequestHandler):
 class QueryHandler(JsonHandler):
     def post(self):
         query = str(self.request.arguments['q'])
+        logger.info("Query: %s", query)
 
         try:
             resp = nlquery.query(query, format_='raw')
