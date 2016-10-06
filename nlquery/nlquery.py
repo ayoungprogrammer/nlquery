@@ -83,7 +83,7 @@ class NLQueryEngine(LoggingInterface):
                         'subj_t': self.subj_rules
                     },
                     # Who did 
-                    '( SQ ( VP ( VBZ/VBD/VBP:action-o ) ( NP:subj_t ) ) )':{
+                    '( SQ ( VP ( VBZ/VBD/VBP:action-o ) ( NP:subj_t ) ) )': {
                         'subj_t': self.subj_rules
                     },
                     # Who is Edward Thatch known as
@@ -113,7 +113,9 @@ class NLQueryEngine(LoggingInterface):
             # 
             ('( SQ/VP ( VB/VBP/VBD ) ( VP ( VBN:prop-o ) ( PP ( IN:op-o ) ( NP:value-o ) ) ) )', {}),
             # are in Asia
-            ('( SQ/VP ( VB/VBP/VBD ) ( PP ( IN:op-o ) ( NP:value-o ) ) )', {}),
+            ('( SQ/VP ( VB/VBP/VBD=are ) ( PP ( IN:op-o ) ( NP:value-o ) ) )', {}),
+            # died from laryngitis
+            ('( SQ/VP ( VB/VBP/VBD:prop-o ) ( PP ( IN:op-o ) ( NP:value-o ) ) )', {}),
             # have population over 1000000
             ('( SQ/VP ( VB/VBP/VBD ) ( NP ( NP:prop-o ) ( PP ( IN:op-o ) ( NP/CD/JJ:value-o ) ) ) )', {}),
             ('( SQ/VP ( VB/VBP/VBD ) ( NP:prop-o ) ( NP ( QP ( JJR:op-o ) ( IN ) ( CD:value-o ) ) ) )', {}),
@@ -215,7 +217,7 @@ class NLQueryEngine(LoggingInterface):
 
         self.info('Prop tuple: {0},{1},{2},{3},{4}', prop, value, op, value_units, pp_t)
 
-        if op in ['in', 'by', 'of']:
+        if op in ['in', 'by', 'of', 'from']:
             oper = op
         elif op in ['over', 'above', 'more', 'greater']:
             oper = '>'

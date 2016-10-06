@@ -189,7 +189,7 @@ class WikiData(RestAdapter):
                 query += """
                         ?val wdt:%s ?value FILTER(?value %s %s) . # Filter by value
                         """ % (prop_id, op, prop_val)
-            elif op in ['in', 'by', 'of']:
+            elif op in ['in', 'by', 'of', 'from']:
                 if op == 'in' and prop_val.isdigit():
                     iso_time = parser.parse(prop_val).isoformat()
 
@@ -207,11 +207,19 @@ class WikiData(RestAdapter):
                 else:
                     # Get value entity
                     prop_val_id = self._get_id(prop_val)
+
                     if prop:
-                        prop_id = self._get_id(prop, 'property')
+                        # Get property id
+                        if prop in ['died', 'killed'] and op in ['from', 'by', 'of']:
+                            # slight hack because lookup for died defaults to place of death
+                            # cause of death
+                            prop_id = 'P509'
+                        else:
+                            prop_id = self._get_id(prop, 'property')
                         query += '?val wdt:%s wd:%s .\n' % (prop_id, prop_val_id)
                     else:
-                        # Infer property of value
+                        # Infer property from value (e.g. How many countries are in China?)
+                        # e.g. infer: How many countries with continent China?
                         prop_id = '*'
                         query += """
                                  wd:%s wdt:P31 ?instance . # Get entities that value is an instance of. Ex: ?instance = wd:Q5107 (continent)
