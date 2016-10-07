@@ -20,6 +20,7 @@ setup(
     install_requires=[
         'lango',
         'pattern',
-        'arrow'
+        'arrow',
+        'grequests',
     ],
 )

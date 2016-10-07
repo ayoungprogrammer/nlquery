@@ -2,9 +2,10 @@
 
 A natural language query engine on WikiData. 
 
-[Demo](http://nlquery.ayoungprogrammer.com)
+* [Demo](http://nlquery.ayoungprogrammer.com)
+* [Blogpost](http://blog.ayoungprogrammer.com/2016/10/creating-natural-language-query-engine.html/)
 
-Sample queries:
+Examples:
 ```
 Who is Obama? 44th President of the United States
 How tall is Yao Ming? 2.286m
