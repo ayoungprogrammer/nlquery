@@ -268,9 +268,10 @@ class WikiData(RestAdapter):
             return self._get_desc(subject)
 
         if prop == 'age':
-            bday_ans = self._get_property(subject, 'birthday')
+            bday_ans = self._get_property(subject, 'date of birth', 'P569')
             if not bday_ans:
                 return None
+            import pdb;pdb.set_trace()
             birthday = bday_ans.data[0]
             years = relativedelta(datetime.now(), birthday).years
             bday_ans.data = years
