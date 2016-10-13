@@ -4,7 +4,7 @@ import arrow
 
 def conv_to_str(value):
     if isinstance(value, datetime):
-        return value.strftime('%B %d, %Y')
+        return arrow.get(value).format("MMMM D, YYYY")
     else:
         return unicode(value)
 
